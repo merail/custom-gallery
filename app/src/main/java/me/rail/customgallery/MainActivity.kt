@@ -33,7 +33,7 @@ class MainActivity: AppCompatActivity() {
             REQUEST_CODE_READ_EXTERNAL_STORAGE_PERMISSION -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     val mediaHandler = MediaHandler()
-                    mediaHandler.getRealPathFromURI(applicationContext)
+                    mediaHandler.findImages(applicationContext)
                 } else {
                     Toast.makeText(
                         this@MainActivity,

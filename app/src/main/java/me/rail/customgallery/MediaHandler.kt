@@ -1,50 +1,51 @@
 package me.rail.customgallery
 
 import android.content.Context
+import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 
 
 class MediaHandler {
-    fun getRealPathFromURI(context: Context) {
+    fun findImages(context: Context) {
         val projection = arrayOf(
             MediaStore.Images.Media._ID,
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
-            MediaStore.Images.Media.DATE_TAKEN
+            MediaStore.Images.Media.DISPLAY_NAME
         )
+        val imagesUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val sortOrder = "date_added DESC"
 
-        val images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-
-        val cur = context.contentResolver.query(
-            images,
+        val cursor = context.contentResolver.query(
+            imagesUri,
             projection,
             null,
             null,
-            null
+            sortOrder
         ) ?: return
 
-        Log.i("ListingImages", " query count=" + cur.count)
+        Log.i("ListingImages", " query count=" + cursor.count)
+        MediaStorage.setImagesCount(cursor.count)
 
-        if (cur.moveToFirst()) {
+        if (cursor.moveToFirst()) {
+            var id: Long
+            var name: String
             var bucket: String
-            var date: String
-            val bucketColumn = cur.getColumnIndex(
-                MediaStore.Images.Media.BUCKET_DISPLAY_NAME
-            )
-            val dateColumn = cur.getColumnIndex(
-                MediaStore.Images.Media.DATE_TAKEN
-            )
-            do {
-                bucket = cur.getString(bucketColumn)
-                date = cur.getString(dateColumn)
 
-                Log.i(
-                    "ListingImages", " bucket=" + bucket
-                            + "  date_taken=" + date
-                )
-            } while (cur.moveToNext())
+            val idColumn = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+            val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+            val bucketColumn = cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+
+            do {
+                id = cursor.getLong(idColumn)
+                val uriImage = Uri.withAppendedPath(imagesUri, "" + id)
+                name = cursor.getString(nameColumn)
+                bucket = cursor.getString(bucketColumn)
+
+                MediaStorage.addImage(Image(uriImage, name, bucket))
+            } while (cursor.moveToNext())
         }
 
-        cur.close()
+        cursor.close()
     }
 }
