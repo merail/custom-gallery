@@ -1,4 +1,4 @@
-package me.rail.customgallery.albumlist
+package me.rail.customgallery.screens.albumlist
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import me.rail.customgallery.databinding.FragmentAlbumListBinding
 import me.rail.customgallery.media.MediaStorage
-import me.rail.customgallery.medialist.MediaAdapter
 
 class AlbumListFragment: Fragment() {
     private lateinit var binding: FragmentAlbumListBinding

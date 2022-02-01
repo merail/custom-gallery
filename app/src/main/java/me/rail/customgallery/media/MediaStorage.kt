@@ -37,4 +37,8 @@ object MediaStorage {
     fun getAlbums(): LinkedHashMap<String, ArrayList<Image>> {
         return albums
     }
+
+    fun getImageByPosition(position: Int): Image {
+        return images[position]
+    }
 }

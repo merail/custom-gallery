@@ -8,10 +8,16 @@ import javax.inject.Inject
 class Navigator @Inject constructor(activity: FragmentActivity) {
     private val fragmentManager = activity.supportFragmentManager
 
-    fun replaceFragment(fragment: Fragment) {
+    fun replaceFragment(container: Int, fragment: Fragment) {
         val transaction = fragmentManager.beginTransaction()
 
-        transaction.replace(R.id.container, fragment)
+        if (container == R.id.fragmentContainer) {
+            transaction.replace(container, fragment)
+        } else {
+            transaction
+                .addToBackStack(fragment::class.java.name)
+                .add(container, fragment)
+        }
 
         transaction.commit()
     }

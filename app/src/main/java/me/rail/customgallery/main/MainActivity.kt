@@ -9,10 +9,9 @@ import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
 import me.rail.customgallery.R
-import me.rail.customgallery.albumlist.AlbumListFragment
 import me.rail.customgallery.databinding.ActivityMainBinding
 import me.rail.customgallery.media.MediaHandler
-import me.rail.customgallery.medialist.MediaListFragment
+import me.rail.customgallery.screens.main.MainFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -26,8 +25,6 @@ class MainActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
-        setupBottomNavigationView()
 
         checkReadExternalStoragePermission()
     }
@@ -50,27 +47,6 @@ class MainActivity: AppCompatActivity() {
         }
     }
 
-    private fun setupBottomNavigationView() {
-        binding.navigation.selectedItemId = R.id.mediaPage
-        binding.navigation.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.mediaPage -> {
-                    navigator.replaceFragment(MediaListFragment())
-                }
-                R.id.albumsPage -> {
-                    navigator.replaceFragment(AlbumListFragment())
-                }
-                else -> {
-                }
-            }
-
-            return@setOnItemSelectedListener true
-        }
-        binding.navigation.setOnItemReselectedListener {
-
-        }
-    }
-
     private fun checkReadExternalStoragePermission() {
         ActivityCompat.requestPermissions(
             this,
@@ -83,7 +59,7 @@ class MainActivity: AppCompatActivity() {
         val mediaHandler = MediaHandler()
         mediaHandler.findImages(applicationContext)
 
-        navigator.replaceFragment(MediaListFragment())
+        navigator.replaceFragment(R.id.container, MainFragment())
     }
 
     private fun showToast(text: String) {

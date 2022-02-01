@@ -1,20 +1,20 @@
-package me.rail.customgallery.medialist
+package me.rail.customgallery.screens.medialist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import me.rail.customgallery.databinding.ItemImageBinding
+import me.rail.customgallery.databinding.ItemMediaBinding
 import me.rail.customgallery.models.Image
 
-class MediaAdapter(private val images: ArrayList<Image>):
+class MediaAdapter(private val images: ArrayList<Image>, private val onImageClick: ((Int) -> Unit)? = null):
     RecyclerView.Adapter<MediaAdapter.ImageViewHolder>() {
 
-    class ImageViewHolder(val binding: ItemImageBinding): RecyclerView.ViewHolder(binding.root)
+    class ImageViewHolder(val binding: ItemMediaBinding): RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ImageViewHolder {
         val inflater = LayoutInflater.from(viewGroup.context)
-        val binding = ItemImageBinding.inflate(inflater, viewGroup, false)
+        val binding = ItemMediaBinding.inflate(inflater, viewGroup, false)
 
         return ImageViewHolder(binding)
     }
@@ -26,6 +26,10 @@ class MediaAdapter(private val images: ArrayList<Image>):
             crossfade(true)
         }
         holder.binding.name.text = item.name
+
+        holder.binding.image.setOnClickListener {
+            onImageClick?.invoke(position)
+        }
     }
 
     override fun getItemCount(): Int {
