@@ -43,7 +43,10 @@ class MediaHandler {
                 name = cursor.getString(nameColumn)
                 bucket = cursor.getString(bucketColumn)
 
-                MediaStorage.addImage(Image(uriImage, name, bucket))
+                val image = Image(uriImage, name, bucket)
+
+                MediaStorage.addImage(image)
+                MediaStorage.addImageToAlbum(bucket, image)
             } while (cursor.moveToNext())
         }
 
