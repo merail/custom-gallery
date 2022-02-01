@@ -38,7 +38,23 @@ object MediaStorage {
         return albums
     }
 
-    fun getImageByPosition(position: Int): Image {
-        return images[position]
+    fun getImageByPosition(position: Int, album: String?): Image {
+        return if (album == null) {
+            images[position]
+        } else {
+            albums[album]!![position]
+        }
+    }
+
+    fun getImagesByAlbum(album: String): ArrayList<Image> {
+        return albums[album]!!
+    }
+
+    fun getCount(album: String?): Int {
+        return if (album == null) {
+            imagesCount
+        } else {
+            albums[album]!!.size
+        }
     }
 }

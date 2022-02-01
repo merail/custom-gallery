@@ -9,8 +9,6 @@ import androidx.fragment.app.Fragment
 import coil.load
 import me.rail.customgallery.databinding.ItemImageBinding
 
-const val ARG_URI_STRING = "uri_string"
-
 class ImageFragment: Fragment() {
     private lateinit var binding: ItemImageBinding
 
@@ -30,6 +28,8 @@ class ImageFragment: Fragment() {
     }
 
     companion object {
+        const val ARG_URI_STRING = "uri_string"
+
         @JvmStatic
         fun newInstance(uriString: String) =
             ImageFragment().apply {

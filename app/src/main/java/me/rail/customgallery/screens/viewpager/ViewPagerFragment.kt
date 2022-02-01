@@ -20,8 +20,6 @@ class ViewPagerFragment: Fragment() {
 
         binding.root.isClickable = true
 
-        binding.pager.adapter = ImageAdapter(requireActivity())
-
         return binding.root
     }
 
@@ -33,16 +31,22 @@ class ViewPagerFragment: Fragment() {
                 binding.pager.setCurrentItem(getInt(ARG_POSITION), false)
             }
         }
+
+        val albumName = arguments?.getString(ARG_ALBUM_NAME)
+
+        binding.pager.adapter = ImageAdapter(requireActivity(), albumName)
     }
 
     companion object {
         private const val ARG_POSITION = "position"
+        private const val ARG_ALBUM_NAME = "album_name"
 
         @JvmStatic
-        fun newInstance(position: Int) =
+        fun newInstance(position: Int, albumName: String ?= null) =
             ViewPagerFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_POSITION, position)
+                    putString(ARG_ALBUM_NAME, albumName)
                 }
             }
     }

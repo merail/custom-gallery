@@ -7,7 +7,10 @@ import coil.load
 import me.rail.customgallery.databinding.ItemMediaBinding
 import me.rail.customgallery.models.Image
 
-class AlbumAdapter(private val albums: LinkedHashMap<String, ArrayList<Image>>):
+class AlbumAdapter(
+    private val albums: LinkedHashMap<String, ArrayList<Image>>,
+    private val onAlbumClick: ((String) -> Unit)? = null
+):
     RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder>() {
 
     class AlbumViewHolder(val binding: ItemMediaBinding): RecyclerView.ViewHolder(binding.root)
@@ -27,6 +30,10 @@ class AlbumAdapter(private val albums: LinkedHashMap<String, ArrayList<Image>>):
             crossfade(true)
         }
         holder.binding.name.text = name
+
+        holder.binding.image.setOnClickListener {
+            onAlbumClick?.invoke(name)
+        }
     }
 
     override fun getItemCount(): Int {
