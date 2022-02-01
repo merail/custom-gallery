@@ -1,6 +1,6 @@
-package me.rail.customgallery
+package me.rail.customgallery.media
 
-import android.util.Log
+import me.rail.customgallery.models.Image
 
 object MediaStorage {
     private var imagesCount = 0
@@ -13,6 +13,9 @@ object MediaStorage {
 
     fun addImage(image: Image) {
         images.add(image)
-        Log.d("AAAAAAAAAAAA", image.toString())
+    }
+
+    fun getImages(): ArrayList<Image> {
+        return images
     }
 }

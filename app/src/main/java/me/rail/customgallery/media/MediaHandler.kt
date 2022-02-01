@@ -1,9 +1,10 @@
-package me.rail.customgallery
+package me.rail.customgallery.media
 
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import me.rail.customgallery.models.Image
 
 
 class MediaHandler {

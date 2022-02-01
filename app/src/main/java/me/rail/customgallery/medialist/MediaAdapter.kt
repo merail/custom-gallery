@@ -1,10 +1,11 @@
-package me.rail.customgallery
+package me.rail.customgallery.medialist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import me.rail.customgallery.databinding.ItemImageBinding
+import me.rail.customgallery.models.Image
 
 class MediaAdapter(private val images: ArrayList<Image>):
     RecyclerView.Adapter<MediaAdapter.ImageViewHolder>() {
@@ -24,6 +25,7 @@ class MediaAdapter(private val images: ArrayList<Image>):
         holder.binding.image.load(item.uri) {
             crossfade(true)
         }
+        holder.binding.name.text = item.name
     }
 
     override fun getItemCount(): Int {

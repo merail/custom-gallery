@@ -1,4 +1,4 @@
-package me.rail.customgallery
+package me.rail.customgallery.models
 
 import android.net.Uri
 
