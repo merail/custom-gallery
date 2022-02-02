@@ -57,7 +57,7 @@ class MainActivity: AppCompatActivity() {
 
     private fun showMedia() {
         val mediaHandler = MediaHandler()
-        mediaHandler.findImages(applicationContext)
+        mediaHandler.findMedia(applicationContext)
 
         navigator.replaceFragment(R.id.container, MainFragment())
     }

@@ -1,19 +1,17 @@
 package me.rail.customgallery.screens.medialist
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import coil.load
 import dagger.hilt.android.AndroidEntryPoint
 import me.rail.customgallery.R
 import me.rail.customgallery.databinding.FragmentMediaListBinding
 import me.rail.customgallery.main.Navigator
 import me.rail.customgallery.media.MediaStorage
-import me.rail.customgallery.screens.viewpager.ImageFragment
+import me.rail.customgallery.screens.video.VideoFragment
 import me.rail.customgallery.screens.viewpager.ViewPagerFragment
 import javax.inject.Inject
 
@@ -23,6 +21,8 @@ class MediaListFragment: Fragment() {
 
     @Inject
     lateinit var navigator: Navigator
+
+    private var albumName: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,21 +40,40 @@ class MediaListFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val albumName = arguments?.getString(ARG_ALBUM_NAME)
+        albumName = arguments?.getString(ARG_ALBUM_NAME)
 
-        val images = if (albumName == null) {
-            MediaStorage.getImages()
+        val medias = if (albumName == null) {
+            MediaStorage.getMedias()
         } else {
-            MediaStorage.getImagesByAlbum(albumName)
+            MediaStorage.getMediasByAlbum(albumName!!)
         }
 
-        binding.mediaList.adapter = MediaAdapter(images) {
-            navigator.replaceFragment(
-                R.id.container,
-                ViewPagerFragment.newInstance(it, albumName),
-                true
-            )
-        }
+        binding.mediaList.adapter = MediaAdapter(
+            medias,
+            onImageClick = ::onImageClick,
+            onVideoClick = ::onVideoClick
+        )
+    }
+
+    private fun onImageClick(position: Int) {
+        navigator.replaceFragment(
+            R.id.container,
+            ViewPagerFragment.newInstance(position, albumName),
+            true
+        )
+    }
+
+    private fun onVideoClick(position: Int) {
+        navigator.replaceFragment(
+            R.id.container,
+            VideoFragment.newInstance(
+                MediaStorage.getVideoByPosition(
+                    position,
+                    albumName
+                ).uri.toString()
+            ),
+            true
+        )
     }
 
     companion object {

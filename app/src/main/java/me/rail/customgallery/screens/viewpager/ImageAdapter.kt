@@ -7,7 +7,7 @@ import me.rail.customgallery.media.MediaStorage
 
 class ImageAdapter(fragment: FragmentActivity, private val albumName: String?):
     FragmentStateAdapter(fragment) {
-    override fun getItemCount(): Int = MediaStorage.getCount(albumName)
+    override fun getItemCount(): Int = MediaStorage.getImageCount(albumName)
 
     override fun createFragment(position: Int): Fragment {
 

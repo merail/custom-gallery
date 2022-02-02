@@ -6,8 +6,14 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import me.rail.customgallery.databinding.ItemMediaBinding
 import me.rail.customgallery.models.Image
+import me.rail.customgallery.models.Media
+import me.rail.customgallery.models.Video
 
-class MediaAdapter(private val images: ArrayList<Image>, private val onImageClick: ((Int) -> Unit)? = null):
+class MediaAdapter(
+    private val medias: ArrayList<Media>,
+    private val onImageClick: ((Int) -> Unit)? = null,
+    private val onVideoClick: ((Int) -> Unit)? = null
+):
     RecyclerView.Adapter<MediaAdapter.ImageViewHolder>() {
 
     class ImageViewHolder(val binding: ItemMediaBinding): RecyclerView.ViewHolder(binding.root)
@@ -20,7 +26,7 @@ class MediaAdapter(private val images: ArrayList<Image>, private val onImageClic
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        val item = images[position]
+        val item = medias[position]
 
         holder.binding.image.load(item.uri) {
             crossfade(true)
@@ -28,11 +34,26 @@ class MediaAdapter(private val images: ArrayList<Image>, private val onImageClic
         holder.binding.name.text = item.name
 
         holder.binding.image.setOnClickListener {
-            onImageClick?.invoke(position)
+            var correctPosition = position
+            if (item is Image) {
+                for (i in 0..position) {
+                    if (medias[i] is Video) {
+                        correctPosition--
+                    }
+                }
+                onImageClick?.invoke(correctPosition)
+            } else {
+                for (i in 0..position) {
+                    if (medias[i] is Image) {
+                        correctPosition--
+                    }
+                }
+                onVideoClick?.invoke(correctPosition)
+            }
         }
     }
 
     override fun getItemCount(): Int {
-        return images.size
+        return medias.size
     }
 }
