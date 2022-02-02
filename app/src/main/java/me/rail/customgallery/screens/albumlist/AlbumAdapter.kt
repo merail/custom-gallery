@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import me.rail.customgallery.databinding.ItemMediaBinding
-import me.rail.customgallery.models.Image
 import me.rail.customgallery.models.Media
 
 class AlbumAdapter(

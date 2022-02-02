@@ -4,103 +4,12 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import me.rail.customgallery.models.Image
 import me.rail.customgallery.models.Media
 import me.rail.customgallery.models.Video
 
 
 class MediaHandler {
-    fun findImages(context: Context) {
-        val projection = arrayOf(
-            MediaStore.Images.Media._ID,
-            MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
-            MediaStore.Images.Media.DISPLAY_NAME
-        )
-        val imagesUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        val sortOrder = "date_added DESC"
-
-        val cursor = context.contentResolver.query(
-            imagesUri,
-            projection,
-            null,
-            null,
-            sortOrder
-        ) ?: return
-
-        Log.i("ListingImages", " query count=" + cursor.count)
-        MediaStorage.setImagesCount()
-
-        if (cursor.moveToFirst()) {
-            var id: Long
-            var name: String
-            var bucket: String
-
-            val idColumn = cursor.getColumnIndex(MediaStore.Images.Media._ID)
-            val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-            val bucketColumn = cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
-
-            do {
-                id = cursor.getLong(idColumn)
-                val uriImage = Uri.withAppendedPath(imagesUri, "" + id)
-                name = cursor.getString(nameColumn)
-                bucket = cursor.getString(bucketColumn)
-
-                val image = Image(uriImage, name, bucket)
-
-                MediaStorage.addImage(image)
-                MediaStorage.addImageToAlbum(bucket, image)
-            } while (cursor.moveToNext())
-        }
-
-        cursor.close()
-    }
-
-    fun findVideos(context: Context) {
-        val projection = arrayOf(
-            MediaStore.Video.Media._ID,
-            MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
-            MediaStore.Video.Media.DISPLAY_NAME
-        )
-        val videosUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-        val sortOrder = "date_added DESC"
-
-        val cursor = context.contentResolver.query(
-            videosUri,
-            projection,
-            null,
-            null,
-            sortOrder
-        ) ?: return
-
-        Log.i("ListingVideos", " query count=" + cursor.count)
-        MediaStorage.setVideosCount()
-
-        if (cursor.moveToFirst()) {
-            var id: Long
-            var name: String
-            var bucket: String
-
-            val idColumn = cursor.getColumnIndex(MediaStore.Video.Media._ID)
-            val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
-            val bucketColumn = cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
-
-            do {
-                id = cursor.getLong(idColumn)
-                val uriVideo = Uri.withAppendedPath(videosUri, "" + id)
-                name = cursor.getString(nameColumn)
-                bucket = cursor.getString(bucketColumn)
-
-                val video = Video(uriVideo, name, bucket)
-
-                MediaStorage.addVideo(video)
-                MediaStorage.addVideoToAlbum(bucket, video)
-            } while (cursor.moveToNext())
-        }
-
-        cursor.close()
-    }
-
     fun findMedia(context: Context) {
         val bucketFileColumn = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             MediaStore.Files.FileColumns.DATA
@@ -120,7 +29,6 @@ class MediaHandler {
 
         val sortOrder = "date_added DESC"
 
-        // Return only video and image metadata.
         val selection = (MediaStore.Files.FileColumns.MEDIA_TYPE + "="
                 + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
                 + " OR "
@@ -137,7 +45,6 @@ class MediaHandler {
             sortOrder
         ) ?: return
 
-        Log.i("ListingVideos", " query count=" + cursor.count)
         MediaStorage.setMediasCount(cursor.count)
         MediaStorage.setImagesCount()
         MediaStorage.setVideosCount()
@@ -164,24 +71,18 @@ class MediaHandler {
                 }
                 val type = cursor.getInt(typeColumn)
 
-                Log.d("AAAAAAAAAAAA", bucket)
-                Log.d("BBBBBBBBBBBB", name)
-                Log.d("CCCCCCCCCCCC", uri.toString())
-                Log.d("DDDDDDDDDDDD", type.toString())
-
+                val media: Media
                 if (type == 1) {
-                    val image = Image(uri, name, bucket)
-                    MediaStorage.addImage(image)
-                    MediaStorage.addImageToAlbum(bucket, image)
-                    MediaStorage.addMedia(image)
-                    MediaStorage.addMediaToAlbum(bucket, image)
+                    media = Image(uri, name)
+                    MediaStorage.addImage(media)
+                    MediaStorage.addImageToAlbum(bucket, media)
                 } else {
-                    val video = Video(uri, name, bucket)
-                    MediaStorage.addVideo(video)
-                    MediaStorage.addVideoToAlbum(bucket, video)
-                    MediaStorage.addMedia(video)
-                    MediaStorage.addMediaToAlbum(bucket, video)
+                    media = Video(uri, name)
+                    MediaStorage.addVideo(media)
+                    MediaStorage.addVideoToAlbum(bucket, media)
                 }
+                MediaStorage.addMedia(media)
+                MediaStorage.addMediaToAlbum(bucket, media)
             } while (cursor.moveToNext())
         }
 

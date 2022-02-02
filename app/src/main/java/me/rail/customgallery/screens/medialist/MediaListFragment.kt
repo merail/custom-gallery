@@ -12,7 +12,7 @@ import me.rail.customgallery.databinding.FragmentMediaListBinding
 import me.rail.customgallery.main.Navigator
 import me.rail.customgallery.media.MediaStorage
 import me.rail.customgallery.screens.video.VideoFragment
-import me.rail.customgallery.screens.viewpager.ViewPagerFragment
+import me.rail.customgallery.screens.viewpager.ImageViewPagerFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -58,7 +58,7 @@ class MediaListFragment: Fragment() {
     private fun onImageClick(position: Int) {
         navigator.replaceFragment(
             R.id.container,
-            ViewPagerFragment.newInstance(position, albumName),
+            ImageViewPagerFragment.newInstance(position, albumName),
             true
         )
     }

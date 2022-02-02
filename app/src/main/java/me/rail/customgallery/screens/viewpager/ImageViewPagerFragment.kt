@@ -1,22 +1,20 @@
 package me.rail.customgallery.screens.viewpager
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import coil.load
-import me.rail.customgallery.databinding.FragmentViewPagerBinding
+import me.rail.customgallery.databinding.FragmentImageViewPagerBinding
 
-class ViewPagerFragment: Fragment() {
-    private lateinit var binding: FragmentViewPagerBinding
+class ImageViewPagerFragment: Fragment() {
+    private lateinit var binding: FragmentImageViewPagerBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentViewPagerBinding.inflate(inflater, container, false)
+        binding = FragmentImageViewPagerBinding.inflate(inflater, container, false)
 
         binding.root.isClickable = true
 
@@ -42,8 +40,8 @@ class ViewPagerFragment: Fragment() {
         private const val ARG_ALBUM_NAME = "album_name"
 
         @JvmStatic
-        fun newInstance(position: Int, albumName: String ?= null) =
-            ViewPagerFragment().apply {
+        fun newInstance(position: Int, albumName: String? = null) =
+            ImageViewPagerFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_POSITION, position)
                     putString(ARG_ALBUM_NAME, albumName)
