@@ -5,7 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import me.rail.customgallery.databinding.ItemMediaBinding
+import me.rail.customgallery.models.Image
 import me.rail.customgallery.models.Media
+import me.rail.customgallery.models.Video
 
 class AlbumAdapter(
     private val albums: LinkedHashMap<String, ArrayList<Media>>,
@@ -26,8 +28,14 @@ class AlbumAdapter(
         val thumbnail = ArrayList(albums.values)[position][0]
         val name = ArrayList(albums.keys)[position]
 
-        holder.binding.image.load(thumbnail.uri) {
-            crossfade(true)
+        if (thumbnail is Image) {
+            holder.binding.image.load(thumbnail.uri) {
+                crossfade(true)
+            }
+        } else if (thumbnail is Video) {
+            holder.binding.image.load(thumbnail.thumbnail) {
+                crossfade(true)
+            }
         }
         holder.binding.name.text = name
 
