@@ -1,6 +1,7 @@
 package me.rail.customgallery.media
 
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -10,6 +11,8 @@ import me.rail.customgallery.models.Video
 
 
 class MediaHandler {
+    private val mediaMetadataRetriever = MediaMetadataRetriever()
+
     fun findMedia(context: Context) {
         val bucketFileColumn = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             MediaStore.Files.FileColumns.DATA
@@ -21,10 +24,7 @@ class MediaHandler {
             MediaStore.Files.FileColumns._ID,
             MediaStore.Files.FileColumns.DISPLAY_NAME,
             bucketFileColumn,
-            MediaStore.Files.FileColumns.DATE_ADDED,
-            MediaStore.Files.FileColumns.MEDIA_TYPE,
-            MediaStore.Files.FileColumns.MIME_TYPE,
-            MediaStore.Files.FileColumns.TITLE
+            MediaStore.Files.FileColumns.MEDIA_TYPE
         )
 
         val sortOrder = "date_added DESC"
@@ -77,7 +77,10 @@ class MediaHandler {
                     MediaStorage.addImage(media)
                     MediaStorage.addImageToAlbum(bucket, media)
                 } else {
-                    media = Video(uri, name)
+                    mediaMetadataRetriever.setDataSource(context, uri)
+                    val thumbnail = mediaMetadataRetriever.frameAtTime
+
+                    media = Video(uri, name, thumbnail)
                     MediaStorage.addVideo(media)
                     MediaStorage.addVideoToAlbum(bucket, media)
                 }

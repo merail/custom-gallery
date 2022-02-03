@@ -28,8 +28,12 @@ class MediaAdapter(
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         val item = medias[position]
 
-        holder.binding.image.load(item.uri) {
-            crossfade(true)
+        if (item is Image) {
+            holder.binding.image.load(item.uri) {
+                crossfade(true)
+            }
+        } else if (item is Video) {
+            holder.binding.image.load(item.thumbnail)
         }
         holder.binding.name.text = item.name
 

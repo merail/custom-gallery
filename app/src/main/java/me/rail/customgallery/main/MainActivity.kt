@@ -32,10 +32,7 @@ class MainActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-    }
 
-    override fun onStart() {
-        super.onStart()
         checkReadExternalStoragePermission()
     }
 
@@ -56,8 +53,8 @@ class MainActivity: AppCompatActivity() {
         ) {
             if (isPermissionErrorVisible()) {
                 hidePermissionError()
-                showMedia()
             }
+            showMedia()
         } else {
             ActivityCompat.requestPermissions(
                 this, Array(1) { Manifest.permission.READ_EXTERNAL_STORAGE },
