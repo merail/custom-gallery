@@ -1,4 +1,4 @@
-This application is a custom gallery for displaying images and videos stored on the device. 
+This Android application is a custom gallery for displaying images and videos stored on the device. 
 
 
 ![alt text](example1.png)
