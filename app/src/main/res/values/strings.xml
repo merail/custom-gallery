@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Custom Gallery</string>
+    <string name="app_name">custom-gallery</string>
     <string name="image">Image</string>
     <string name="media">Media</string>
     <string name="albums">Albums</string>
