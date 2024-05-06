@@ -55,4 +55,6 @@ dependencies {
 
     implementation("androidx.fragment:fragment-ktx:1.7.0")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
+
+    implementation("com.github.merail:request-permissions-tool:1.1.0")
 }

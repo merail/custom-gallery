@@ -1,17 +1,18 @@
 package merail.custom.gallery.main
 
 import android.Manifest
+import android.os.Build
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
 import merail.custom.gallery.R
 import merail.custom.gallery.databinding.ActivityMainBinding
-import merail.custom.gallery.main.permission.GoingToSettingsSnackbar
-import merail.custom.gallery.main.permission.RuntimePermissionRequester
 import merail.custom.gallery.media.MediaHandler
 import merail.custom.gallery.screens.main.MainFragment
+import merail.tools.permissions.SettingsSnackbar
+import merail.tools.permissions.runtime.RuntimePermissionRequester
+import merail.tools.permissions.runtime.RuntimePermissionState
 import javax.inject.Inject
 
 
@@ -24,88 +25,40 @@ class MainActivity: AppCompatActivity() {
     lateinit var navigator: Navigator
 
     private lateinit var runtimePermissionRequester: RuntimePermissionRequester
-    private var permissions = Array(1) { Manifest.permission.READ_EXTERNAL_STORAGE }
-    private lateinit var notGrantedPermissions: ArrayList<String>
+
+    private var permissions = when (Build.VERSION.SDK_INT) {
+        Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> arrayOf(
+            Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_MEDIA_VIDEO,
+            Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
+        )
+        Build.VERSION_CODES.TIRAMISU -> arrayOf(
+            Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_MEDIA_VIDEO,
+        )
+        else -> arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        setOnGetPermissionsClickListener()
-
-        runtimePermissionRequester = RuntimePermissionRequester(this)
-
-        if (!runtimePermissionRequester.checkSelfPermissions(permissions)) {
-            runtimePermissionRequester.requestPermissions()
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        checkRuntimePermissions()
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        notGrantedPermissions = runtimePermissionRequester.onRequestPermissionsResult(
-            requestCode,
-            permissions,
-            grantResults
+        runtimePermissionRequester = RuntimePermissionRequester(
+            activity = this,
+            requestedPermissions = permissions,
         )
 
-        setGetRuntimePermissionsVisibility(notGrantedPermissions.isEmpty())
-        if (notGrantedPermissions.isEmpty()) {
-            showMedia()
-        }
-    }
-
-    private fun setOnGetPermissionsClickListener() {
-        binding.requestPermission.setOnClickListener { view: View ->
-            checkPermissionsForRationale()
-            checkDeniedPermissions(view)
-        }
-    }
-
-    private fun checkRuntimePermissions() {
-        val isAllRuntimePermissionsGranted =
-            runtimePermissionRequester.checkSelfPermissions(permissions)
-        setGetRuntimePermissionsVisibility(isAllRuntimePermissionsGranted)
-        if (isAllRuntimePermissionsGranted) {
-            showMedia()
-        }
-    }
-
-    private fun setGetRuntimePermissionsVisibility(hide: Boolean) {
-        if (hide) {
-            binding.permissionErrorContainer.visibility = View.GONE
-        } else {
-            binding.permissionErrorContainer.visibility = View.VISIBLE
-        }
-    }
-
-    private fun checkPermissionsForRationale() {
-        val permissionsForRationale =
-            runtimePermissionRequester.getPermissionsForRationale(notGrantedPermissions)
-        if (permissionsForRationale.isNotEmpty()) {
-            runtimePermissionRequester.setPermissionsForRequest(permissionsForRationale)
-            runtimePermissionRequester.requestPermissions()
-        }
-    }
-
-    private fun checkDeniedPermissions(view: View) {
-        val deniedPermissions =
-            runtimePermissionRequester.getDeniedPermissions(notGrantedPermissions)
-        if (deniedPermissions.isNotEmpty()) {
-            val goingToSettingsSnackbar = GoingToSettingsSnackbar(this, view)
-            goingToSettingsSnackbar.showSnackbar(
-                "You must grant permissions in Settings!",
-                "Settings"
-            )
+        if (runtimePermissionRequester.areAllPermissionsGranted().not()) {
+            runtimePermissionRequester.requestPermissions {
+                if (runtimePermissionRequester.areAllPermissionsGranted()) {
+                    showMedia()
+                } else if (it.containsValue(RuntimePermissionState.PERMANENTLY_DENIED)) {
+                    SettingsSnackbar(this, binding.root).showSnackbar(
+                        text = "You must grant permissions in Settings!",
+                        actionName = "Settings",
+                    )
+                }
+            }
         }
     }
 
