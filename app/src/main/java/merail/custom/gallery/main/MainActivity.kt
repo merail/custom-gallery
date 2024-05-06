@@ -4,6 +4,7 @@ import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
 import merail.custom.gallery.R
@@ -26,13 +27,13 @@ class MainActivity: AppCompatActivity() {
 
     private lateinit var runtimePermissionRequester: RuntimePermissionRequester
 
-    private var permissions = when (Build.VERSION.SDK_INT) {
-        Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> arrayOf(
+    private var permissions = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> arrayOf(
             Manifest.permission.READ_MEDIA_IMAGES,
             Manifest.permission.READ_MEDIA_VIDEO,
             Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
         )
-        Build.VERSION_CODES.TIRAMISU -> arrayOf(
+        Build.VERSION.SDK_INT == Build.VERSION_CODES.TIRAMISU -> arrayOf(
             Manifest.permission.READ_MEDIA_IMAGES,
             Manifest.permission.READ_MEDIA_VIDEO,
         )
@@ -41,6 +42,7 @@ class MainActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         runtimePermissionRequester = RuntimePermissionRequester(
@@ -49,16 +51,32 @@ class MainActivity: AppCompatActivity() {
         )
 
         if (runtimePermissionRequester.areAllPermissionsGranted().not()) {
-            runtimePermissionRequester.requestPermissions {
-                if (runtimePermissionRequester.areAllPermissionsGranted()) {
-                    showMedia()
-                } else if (it.containsValue(RuntimePermissionState.PERMANENTLY_DENIED)) {
-                    SettingsSnackbar(this, binding.root).showSnackbar(
-                        text = "You must grant permissions in Settings!",
-                        actionName = "Settings",
-                    )
-                }
-            }
+            runtimePermissionRequester.requestPermissions(::onPermissionsRequest)
+        }
+
+        binding.requestPermission.setOnClickListener {
+            runtimePermissionRequester.requestPermissions(::onPermissionsRequest)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        runtimePermissionRequester.requestPermissions(::onPermissionsRequest)
+    }
+
+    private fun onPermissionsRequest(
+        permissionsStateMap: Map<String, RuntimePermissionState>,
+    ) {
+        if (runtimePermissionRequester.areAllPermissionsGranted()) {
+            binding.permissionErrorContainer.isVisible = false
+            showMedia()
+        } else if (permissionsStateMap.containsValue(RuntimePermissionState.PERMANENTLY_DENIED)) {
+            binding.permissionErrorContainer.isVisible = true
+            SettingsSnackbar(this, binding.root).showSnackbar(
+                text = "You must grant permissions in Settings!",
+                actionName = "Settings",
+            )
         }
     }
 
